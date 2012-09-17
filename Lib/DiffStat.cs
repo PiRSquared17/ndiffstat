@@ -68,18 +68,20 @@ namespace NDiffStatLib
 		public DiffStat( TextReader lines, DiffStatOptions options )
 		{
 			this.options = options;
-			Parse(lines);
+			ParseDiff(lines);
 		}
 
-		private void Parse( TextReader lines )
+		private void ParseDiff( TextReader lines )
 		{	
 			RegexOptions options = RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.ExplicitCapture;
 			// Hg diff format
 			// e.g. --- a/path_to_file	Fri Sep 07 18:14:51 2012 +0200
-			Regex regHgDiff = new Regex(@"^(?<prefix>---|\+\+\+) ([ab]/)?(?<fileName>.+?)\t(.+)$", options);
+			Regex regHgSourceTargetFile = new Regex(@"^(?<prefix>---|\+\+\+) ([ab]/)?(?<fileName>.+?)\t(.+)$", options);
 			// Svn diff format
 			// e.g. --- path_to_file		(revision xxx)
-			Regex regSvnDiff = new Regex(@"^(?<prefix>---|\+\+\+) (?<fileName>.+?)\t\(revision (?<revision>\d+)\)$", options);
+			Regex regSvnSourceTargetFile = new Regex(@"^(?<prefix>---|\+\+\+) (?<fileName>.+?)\t\(revision (?<revision>\d+)\)$", options);
+
+			// Regex regChunkHeader = new Regex(@"^@@ -(?<sourceStart>\d+)(?:,(?<sourceLength>\d+))? \+(?<targetStart>\d+)(?:,(?<targetLength>\d+))?\ @@");
 
 			FileStat currentFS = null;
 			string line;
@@ -92,36 +94,35 @@ namespace NDiffStatLib
 					// if whe find a line begining with '+' or '-' and we don't know witch file its refers to, something turned wrong
 					throw new Exception(string.Format("Error : fileName couldn't be parsed in lines 0-{0}", lineCount));
 				} else if (line_added) {
-					currentFS.Accumulate(adds: 1);
+					currentFS.LineFound(LinesType.added);
 				} else if (line_deleted) {
-					currentFS.Accumulate(removes: 1);
+					currentFS.LineFound(LinesType.removed);
 				} else {
 					if (currentFS != null) {
-						// here we compute modified lines (if required) as : min ( adds, removes )
-						currentFS.FlushAccumulator(this.options.merge_opt);
+						currentFS.LineFound(LinesType.others);
 					}
 					if (line.StartsWith("+++ ") || line.StartsWith("--- ")) {
 						if (this.diffFormat == DiffFormat.unknown || this.diffFormat == DiffFormat.hgDiff) {
-							Match match = regHgDiff.Match(line);
+							Match match = regHgSourceTargetFile.Match(line);
 							if (match.Success) {
 								this.diffFormat = DiffFormat.hgDiff;
 								if (match.Groups["prefix"].Value == "---") {
 									AddStats(currentFS);
-									currentFS = new FileStat(match.Groups["fileName"].Value);
+									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
 								} else if (currentFS != null && currentFS.fileName == "/dev/null" && match.Groups["prefix"].Value == "+++") {
 									// cas d'un nouveau fichier. Dans ce cas a lu "/dev/null" comme nom du fichier lors du parsing de la ligne "--- "
 									// --> on recrée un nouvel objet FileStat avec le bon nom de fichier
-									currentFS = new FileStat(match.Groups["fileName"].Value);
+									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
 								}
 							}
 						}
 						if (this.diffFormat == DiffFormat.unknown || this.diffFormat == DiffFormat.svnDiff) {
-							Match match = regSvnDiff.Match(line);
+							Match match = regSvnSourceTargetFile.Match(line);
 							if (match.Success) {
 								this.diffFormat = DiffFormat.svnDiff;
 								if (currentFS == null && match.Groups["prefix"].Value == "---") {
 									AddStats(currentFS);
-									currentFS = new FileStat(match.Groups["fileName"].Value);
+									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
 								}
 							}
 						}
@@ -132,10 +133,10 @@ namespace NDiffStatLib
 				}
 			}
 			if (currentFS != null) {
-				currentFS.FlushAccumulator(this.options.merge_opt);
+				currentFS.ClearTempStats();
 				AddStats(currentFS);
 			}
-		} 
+		}
 
 		private void AddStats(FileStat fileStat) {
 			if (fileStat == null) return;
@@ -159,7 +160,7 @@ namespace NDiffStatLib
 
 			// Work out widths
 			int maxChangeCountWidth = CalcUtils.Max(maxtotal.ToString().Length, 5);
-			int separatorsCharsCount = 4; // one space at the begining of line, two after filename (" |"), one space after change count column
+			int separatorsCharsCount = 4; // one space at the begining of line, two chars after filename (" |"), one space after change count column
 			int graphWidth = DEFAULT_MAX_WIDTH - maxChangeCountWidth - longuestNameLength - separatorsCharsCount;
 
 			// The graph width can be <= 0 if there is a modified file with a
@@ -234,74 +235,5 @@ namespace NDiffStatLib
 			}
 		}
 	}
-
-	public class FileStat
-	{
-		public string fileName { get; private set; }
-		public int adds { get; private set; }
-		public int removes { get; private set; }
-		public int modifs { get; private set; }
-		/// <summary>
-		/// Object witch serves as buffer for added / removed lines counts
-		/// This allow to compute modified lines (if required) as
-		/// min ( adds, removes )	where adds / removes are values stored in the buffer
-		/// </summary>
-		private ChunkStat accumulator;
-		public int total {
-			get { return adds + removes + modifs; }
-		}
-
-		public FileStat(string fileName) : this(fileName, 0, 0, 0) {}
-
-		public FileStat(string fileName, int adds, int removes, int modifs) {
-			this.fileName = fileName;
-			this.adds = adds;
-			this.removes = removes;
-			this.modifs = modifs;
-			this.accumulator = new ChunkStat();
-		}
-
-		public void SumWith(FileStat other) {
-			if (this.fileName != other.fileName) {
-				throw new Exception("FileStat.Add cannot add files with differents name");
-			}
-			this.adds += other.adds;
-			this.removes += other.removes;
-			this.modifs += other.modifs;
-		}
-		public void Accumulate( int adds=0, int removes=0 )
-		{
-			this.accumulator.adds += adds;
-			this.accumulator.removes += removes;
-		}
-		public void FlushAccumulator( bool merge_opt )
-		{
-			if (this.accumulator.adds == 0 && this.accumulator.removes == 0) return;
-			int modifs = merge_opt ? CalcUtils.Min(this.accumulator.adds, this.accumulator.removes) : 0;
-			this.adds += (this.accumulator.adds - modifs);
-			this.removes += (this.accumulator.removes - modifs);
-			this.modifs += modifs;
-			this.accumulator.Reset();
-		}
-	}
-
-	internal class ChunkStat
-	{
-		public int adds;
-		public int removes;
-
-		public ChunkStat()
-		{
-			Reset();
-		}
-
-		public void Reset()
-		{
-			adds = 0;
-			removes = 0;
-		}
-
-	}
-
 	
 }
