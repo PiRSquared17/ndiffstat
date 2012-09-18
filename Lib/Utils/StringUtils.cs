@@ -3,15 +3,12 @@ using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.IO;
 
 namespace NDiffStatLib.Utils
 {
 	public static class StringUtils
 	{
-		const string alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		const string alphabet_lower = "abcdefghijklmnopqrstuvwxyz";
-		const string STARTING_WORD_REGEX = @"[^-'\w][-'\w]";
-		const string ENDING_WORD_REGEX = @"[-'\w][^-'\w]";
 		
 		/// <summary>
 		/// Extrait la sous-chaîne formée des n premiers caractères d'une chaîne donnée.
@@ -44,23 +41,6 @@ namespace NDiffStatLib.Utils
 		{
 			if (input.HasValue) return input.ToString();
 			else return "null";
-		}
-
-		public static string XPathToLower( string s )
-		{
-			return "translate(" + s + ", '" + alphabet_upper + "' ,'" + alphabet_lower + "')"; 
-		}
-
-		/// <summary>
-		/// Encode la chaîne pour pouvoir l'inserer dans une requête sql
-		/// </summary>
-		/// <param name="s">Chaine à encoder</param>
-		/// <param name="defaultValue">Chaîne à retourer lorsque le paramètre d'entrée est null</param>
-		/// <returns>Chaine encodée</returns>
-		public static string SqlEncode( this string s, string defaultValue=null )
-		{
-			if (s == null) return defaultValue;
-			return "'" + s.Replace("'", "''") + "'";
 		}
 
 		/// <summary>
@@ -107,44 +87,6 @@ namespace NDiffStatLib.Utils
 			return true;
 		}
 
-		public static string SchrinkSpaces(string text, bool trim=true) {
-			// remove double spaces
-			StringBuilder spaceBuffer = new StringBuilder();
-			StringBuilder sb = new StringBuilder();
-			foreach (char c in text) {
-				if (!c.IsSpaceOrTab()) {
-					if (spaceBuffer.Length > 0) {
-						if (c.In('\r', '\n')) {
-							// enlever les espaces /tabulations en fin de ligne
-							spaceBuffer.Clear();
-						} else {
-							string spaces = spaceBuffer.ToString();
-							if (spaces.Contains("\t")) {
-								sb.Append(spaces.Replace(" ", "")); // plusieurs espaces / tabulations mélangés soit réduits aux seules tabulations
-							} else {
-								sb.Append(' '); // si on a que des espaces, on réduit à un seul espace
-							}
-						}
-						spaceBuffer.Clear();
-					}
-					sb.Append(c);
-				} else {
-					spaceBuffer.Append(c);
-				}
-			}
-			string remainingSpaces = spaceBuffer.ToString();
-			if (remainingSpaces.Contains("\t")) {
-				sb.Append(remainingSpaces.Replace(" ", "")); // plusieurs espaces / tabulations mélangés sont réduits aux seules tabulations
-			} else {
-				sb.Append(' '); // si on a que des espaces, on réduit à un seul espace
-			}
-			if (trim && sb.Length > 0) {
-				if (sb[0].IsSpaceOrTab()) sb.Remove(0, 1);
-				if (sb[sb.Length-1].IsSpaceOrTab()) sb.Remove(sb.Length-1, 1); 
-			}
-			return sb.ToString();
-		}
-
 		public static string ReplaceChars( string text, string charsToReplace, char? replacement )
 		{
 			int index = -1;
@@ -167,38 +109,6 @@ namespace NDiffStatLib.Utils
 		}
 
 		/// <summary>
-		/// Retourne la position du 1er mot dans la chaîne (caractère "non mot" suivi d'un caractère "mot")
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static int GetFirstWordBeginingPos( string s, int startIndex, int length )
-		{
-			Regex wordReg = new Regex(STARTING_WORD_REGEX, RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
-			Match match = wordReg.Match(s, startIndex, length);
-			if (match.Success) {
-				return match.Index + 1;
-			} else {
-				return -1;
-			}
-		}
-
-		/// <summary>
-		/// Retourne la position de fin du 1er mot dans la chaîne (caractère "non mot" suivi d'un caractère "mot")
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static int GetFirstWordEndPos( string s, int startIndex, int length )
-		{
-			Regex wordReg = new Regex(ENDING_WORD_REGEX, RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
-			Match match = wordReg.Match(s, startIndex, length);
-			if (match.Success) {
-				return match.Index + 1;
-			} else {
-				return -1;
-			}
-		}
-
-		/// <summary>
 		/// Supprime les accents d'une chaîne de caractères donnée
 		/// </summary>
 		/// <param name="s"></param>
@@ -216,6 +126,32 @@ namespace NDiffStatLib.Utils
 			}
 
 			return (sb.ToString().Normalize(NormalizationForm.FormC));
+		}
+
+		public static IEnumerable<string> ReadAsCollection( this TextReader reader )
+		{
+			string currentLine;
+			while ((currentLine = reader.ReadLine()) != null) {
+				yield return currentLine;
+			}
+		}
+
+		/// <summary>
+		///	Check whether a string is a representation of a natural number.
+		///	Returns false for null/empty string
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns></returns>
+		public static bool IsNaturalNumberString( string s )
+		{
+			if (s.IsNullOrEmpty()) {
+				return false;
+			} else {
+				for (int i = 0 ; i < s.Length ; i++) {
+					if (!Char.IsDigit(s[i])) return false;
+				}
+				return true;
+			}
 		}
 	}
 }

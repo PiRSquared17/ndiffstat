@@ -5,7 +5,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDiffStatLib", "Lib\NDiffSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{0890019F-ABBE-4907-BD72-4ADB71D8D51D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{8344C648-F267-48EF-8E01-E4B20CAAF220}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10816A1F-9F0B-4740-9144-62486C83333C}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		NDiffStat.vsmdi = NDiffStat.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = NDiffStat.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -35,6 +47,16 @@ Global
 		{0890019F-ABBE-4907-BD72-4ADB71D8D51D}.Release|Mixed Platforms.Build.0 = Release|x86
 		{0890019F-ABBE-4907-BD72-4ADB71D8D51D}.Release|x86.ActiveCfg = Release|x86
 		{0890019F-ABBE-4907-BD72-4ADB71D8D51D}.Release|x86.Build.0 = Release|x86
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8344C648-F267-48EF-8E01-E4B20CAAF220}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
