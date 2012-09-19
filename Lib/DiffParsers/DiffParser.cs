@@ -22,7 +22,7 @@ namespace NDiffStatLib.DiffParsers
 		public bool deleted;
 		public bool moved;
 
-		private void FileDiff()
+		public FileDiff()
 		{
 			this.origFile = null;
 			this.newFile = null;
