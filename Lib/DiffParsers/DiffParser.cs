@@ -21,8 +21,9 @@ namespace NDiffStatLib.DiffParsers
 		public bool binary;
 		public bool deleted;
 		public bool moved;
-		
-		private void File() {
+
+		private void FileDiff()
+		{
 			this.origFile = null;
 			this.newFile = null;
 			this.origInfo = null;
