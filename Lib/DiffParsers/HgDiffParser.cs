@@ -145,5 +145,17 @@ namespace NDiffStatLib.DiffParsers
 				return false;
 			}
 		}
+
+		public RevisionParseResult parse_diff_revision( string file_str, string revision_str )
+		{
+			string revision = revision_str;
+			if (file_str == "/dev/null") {
+				revision = Revision.PRE_CREATION;
+			}
+			if (revision_str.IsNullOrEmpty()) {
+				revision = Revision.UNKNOWN;
+			}
+			return new RevisionParseResult(file_str, revision);
+		}
 	}
 }
