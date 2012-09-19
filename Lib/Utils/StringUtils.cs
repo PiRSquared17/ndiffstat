@@ -9,7 +9,6 @@ namespace NDiffStatLib.Utils
 {
 	public static class StringUtils
 	{
-		
 		/// <summary>
 		/// Extrait la sous-chaîne formée des n premiers caractères d'une chaîne donnée.
 		/// </summary>
@@ -149,6 +148,24 @@ namespace NDiffStatLib.Utils
 			} else {
 				for (int i = 0 ; i < s.Length ; i++) {
 					if (!Char.IsDigit(s[i])) return false;
+				}
+				return true;
+			}
+		}
+
+		/// <summary>
+		///	Check whether a string is a representation of a natural number.
+		///	Returns false for null/empty string
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns></returns>
+		public static bool IsAlphaNumString( string s )
+		{
+			if (s.IsNullOrEmpty()) {
+				return false;
+			} else {
+				for (int i = 0 ; i < s.Length ; i++) {
+					if (!char.IsDigit(s[i]) && !((int)char.ToLower(s[i])).IsBetween((int)'a', (int)'f')) return false;
 				}
 				return true;
 			}

@@ -40,5 +40,13 @@ namespace NDiffStatLib.Utils
 			}
 			return min;
 		}
+
+		/// <summary>
+		/// Return true if x belongs to [min(a,b), max(a,b)], false otherwise
+		/// </summary>
+		public static bool IsBetween<T>( this T x, T a, T b ) where T : IComparable
+		{
+			return x.Equals(a) || x.Equals(b) || a.CompareTo(x) == x.CompareTo(b);
+		}
 	}
 }
