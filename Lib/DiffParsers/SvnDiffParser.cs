@@ -31,22 +31,22 @@ namespace NDiffStatLib.DiffParsers
 		{
 			base.parse_special_header(reader, info, sbHeader);
 
-			if (info.AllKeys.Contains("index") && reader.CurrentLine != null) {
-				if (reader.CurrentLine == BINARY_STRING) {
-					// Skip this and the svn:mime-type line.
-					sbHeader.AppendLine(reader.CurrentLine);
-					reader.MoveFoward();
-					sbHeader.AppendLine(reader.CurrentLine);
-					reader.MoveFoward();
+			if (info.AllKeys.Contains("index") && reader.CurrentLine == BINARY_STRING) {
 
-					info["binary"] = "True";
-					info["origFile"] = info["index"];
-					info["newFile"] = info["index"];
+				// Skip this and the svn:mime-type line.
+				sbHeader.AppendLine(reader.CurrentLine);
+				reader.MoveFoward();
+				sbHeader.AppendLine(reader.CurrentLine);
+				reader.MoveFoward();
 
-					// We can't get the revision info from this diff header.
-					info["origInfo"] = "(unknown)";
-					info["newInfo"] = "(working copy)";
-				}
+				info["binary"] = "True";
+				info["origFile"] = info["index"];
+				info["newFile"] = info["index"];
+
+				// We can't get the revision info from this diff header.
+				info["origInfo"] = "(unknown)";
+				info["newInfo"] = "(working copy)";
+
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace NDiffStatLib.DiffParsers
 
 			Match match = revision_re.Match(revision_str);
 			if (!match.Success) {
-				throw new Exception(string.Format("Unable to parse diff revision header '{0}'", revision_str));
+				throw new SvnDiffParserError("Unable to parse diff revision header '{0}'", revision_str);
 			}
 
 			string relocated_file = match.Groups[2].Value;
@@ -80,7 +80,7 @@ namespace NDiffStatLib.DiffParsers
 
 			if (!relocated_file.IsNormalized()) {
 				if (!relocated_file.StartsWith("...")) {
-					throw new Exception(string.Format("Unable to parse SVN relocated path '{0}'", relocated_file));
+					throw new SvnDiffParserError("Unable to parse SVN relocated path '{0}'", relocated_file);
 				}
 				file_str = string.Format("{0}/{1}", relocated_file.Substring(4), file_str);
 			}
@@ -100,34 +100,8 @@ namespace NDiffStatLib.DiffParsers
 		}
 	}
 
-	public class Revision : IEquatable<Revision>
+	public class SvnDiffParserError : DiffParserError
 	{
-		public const string HEAD = "HEAD";
-		public const string UNKNOWN = "UNKNOWN";
-		public const string PRE_CREATION = "PRE_CREATION";
-
-		public readonly int? revNumber;
-		public readonly string rev_str;
-
-		public Revision( string rev_str )
-		{
-			if (StringUtils.IsNaturalNumberString(rev_str)) {
-				revNumber = int.Parse(rev_str);
-			} else {
-				if (!rev_str.In(HEAD, UNKNOWN, PRE_CREATION)) {
-					throw new ArgumentNullException("Invalid argument for Revision constructor : '" + rev_str + "'");
-				}
-			}
-			this.rev_str = rev_str;
-		}
-
-
-		#region IEquatable<Revision> Membres
-		public bool Equals( Revision other )
-		{
-			if (other == null) return false;
-			return this.rev_str == other.rev_str;
-		}
-		#endregion
+		public SvnDiffParserError( string msg, params string[] args ) : base(msg, args) { }
 	}
 }

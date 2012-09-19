@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DiffParsers\DiffParser.cs" />
+    <Compile Include="DiffParsers\HgDiffParser.cs" />
+    <Compile Include="DiffParsers\Revision.cs" />
     <Compile Include="DiffParsers\SvnDiffParser.cs" />
     <Compile Include="DiffStat.cs" />
     <Compile Include="FileStat.cs" />

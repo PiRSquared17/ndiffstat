@@ -64,6 +64,8 @@ namespace NDiffStatLib.DiffParsers
 		{
 			this.linenum = linenum;
 		}
+
+		protected DiffParserError( string msg, params string[] args) : base(string.Format(msg, args)) {}
 	}
 
 	/// <summary>
@@ -195,11 +197,12 @@ namespace NDiffStatLib.DiffParsers
 		/// The line number returned is the line after the special header,
 		/// which can be multiple lines long.
 		/// </summary>
-		private void parse_diff_header( CustomTextReader reader, NameValueCollection info, StringBuilder sbHeader )
+		protected virtual void parse_diff_header( CustomTextReader reader, NameValueCollection info, StringBuilder sbHeader )
 		{
 
-			if (reader.CurrentLine.StartsWith("--- ") && reader.NextLine.StartsWith("+++ ") 
-			   || reader.CurrentLine.StartsWith("*** ") && reader.NextLine.StartsWith("--- ") && !reader.CurrentLine.EndsWith(" ****")) {
+			if (reader.NextLine != null && (
+				reader.CurrentLine.StartsWith("--- ") && reader.NextLine.StartsWith("+++ ") 
+			   || reader.CurrentLine.StartsWith("*** ") && reader.NextLine.StartsWith("--- ") && !reader.CurrentLine.EndsWith(" ****"))) {
 				// This is a unified || context diff header. Parse the
 				// file && extra info.
 				try {
