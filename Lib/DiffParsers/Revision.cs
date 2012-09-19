@@ -27,6 +27,11 @@ namespace NDiffStatLib.DiffParsers
 			this.rev_str = rev_str;
 		}
 
+		public Revision( int rev_num )
+		{
+			revNumber = rev_num;
+			rev_str = rev_num.ToString();
+		}
 
 		#region IEquatable<Revision> Membres
 		public bool Equals( Revision other )

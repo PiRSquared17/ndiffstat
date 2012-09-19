@@ -13,15 +13,25 @@ namespace NDiffStatLib.DiffParsers
 	/// </summary>
 	public class SvnDiffParser : DiffParser
 	{
-		private Regex revision_re = new Regex(
-			@"^(\(([^\)]+)\)\s)?"							// creating diffs between two branches of a remote repository 
-															// will insert extra "relocation information" into the diff.
-		  + @"(?:\d+-\d+-\d+\ +\d+:\d+:\d+\ +[A-Z]+\ +)?	"	// svnlook-style diffs contain a timestamp on each line before the
-															// revision number.  This here is probably a really crappy way to
-															// express that, but oh well.
-		  + @"\ *\([Rr]ev(?:ision)?\ (\d+)\)$",				// svnlook uses 'rev 0' while svn diff uses 'revision 0'
+		private static Regex revision_re
+		{
+			get
+			{
+				return new Regex(
+				   @"^(\(([^\)]+)\)\s)?"	// creating diffs between two branches of a remote repository 
+											// will insert extra "relocation information" into the diff.
+				 + @"(?:\d+-\d+-\d+\ +\d+:\d+:\d+\ +[A-Z]+\ +)?	"	
+											// svnlook-style diffs contain a timestamp 
+											// on each line before the
+											// revision number.  This here is probably 
+											// a really crappy way to
+											// express that, but oh well.
+				 + @"\ *\([Rr]ev(?:ision)?\ (\d+)\)$",				
+											// svnlook uses 'rev 0' while svn diff uses 'revision 0'
 
-		  RegexOptions.Compiled | RegexOptions.Singleline);
+				 RegexOptions.Compiled | RegexOptions.Singleline);
+			}
+		}
 
 		const string BINARY_STRING = "Cannot display: file marked as a binary type.";
 
@@ -50,7 +60,7 @@ namespace NDiffStatLib.DiffParsers
 			}
 		}
 
-		public RevisionParseResult parse_diff_revision( string file_str, string revision_str )
+		public static RevisionParseResult parse_diff_revision( string file_str, string revision_str )
 		{
 			// Some diffs have additional tabs between the parts of the file revisions
 			revision_str = revision_str.Trim();

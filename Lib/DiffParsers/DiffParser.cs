@@ -89,7 +89,7 @@ namespace NDiffStatLib.DiffParsers
 		/// Parses the diff, returning a list of File objects representing each
 		/// file in the diff.
 		/// </summary>
-		private List<FileDiff> parse()
+		public List<FileDiff> parse()
 		{
 			Debug.WriteLine("DiffParser.parse: Beginning parse of diff");
 

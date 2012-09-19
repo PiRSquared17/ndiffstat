@@ -146,7 +146,7 @@ namespace NDiffStatLib.DiffParsers
 			}
 		}
 
-		public RevisionParseResult parse_diff_revision( string file_str, string revision_str )
+		public static RevisionParseResult parse_diff_revision( string file_str, string revision_str )
 		{
 			string revision = revision_str;
 			if (file_str == "/dev/null") {
