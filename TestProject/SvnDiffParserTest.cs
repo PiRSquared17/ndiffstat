@@ -1,10 +1,7 @@
-﻿using NDiffStatLib.DiffParsers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Specialized;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NDiffStatLib.DiffParsers;
 
 namespace TestProject
 {
@@ -160,7 +157,7 @@ namespace TestProject
 			   Assert.AreEqual(4, SvnDiffParser.parse_diff_revision("", fileDiffs[0].origInfo).revision.revNumber);
 			   Assert.AreEqual(
 					new Revision(Revision.HEAD),
-					SvnDiffParser.parse_diff_revision("", fileDiffs[0].newInfo)
+					SvnDiffParser.parse_diff_revision("", fileDiffs[0].newInfo).revision
 			   );
 		   }
 	   }

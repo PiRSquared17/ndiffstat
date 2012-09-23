@@ -20,13 +20,13 @@ namespace NDiffStatLib.DiffParsers
 				return new Regex(
 				   @"^(\(([^\)]+)\)\s)?"	// creating diffs between two branches of a remote repository 
 											// will insert extra "relocation information" into the diff.
-				 + @"(?:\d+-\d+-\d+\ +\d+:\d+:\d+\ +[A-Z]+\ +)?	"	
+				 + @"(?:\d+-\d+-\d+\ +\d+:\d+:\d+\ +[A-Z]+\ +)?"
 											// svnlook-style diffs contain a timestamp 
 											// on each line before the
 											// revision number.  This here is probably 
 											// a really crappy way to
 											// express that, but oh well.
-				 + @"\ *\([Rr]ev(?:ision)?\ (\d+)\)$",				
+				 + @"\ *\([Rr]ev(?:ision)?\ (\d+)\)$",
 											// svnlook uses 'rev 0' while svn diff uses 'revision 0'
 
 				 RegexOptions.Compiled | RegexOptions.Singleline);

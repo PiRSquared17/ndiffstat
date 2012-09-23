@@ -173,7 +173,7 @@ namespace NDiffStatLib.DiffParsers
 		/// <param name="info"></param>
 		protected virtual void parse_special_header( CustomTextReader reader, NameValueCollection info, StringBuilder sbHeader )
 		{
-			if (reader.CurrentLine.StartsWith("Index: ") && reader.NextLine == this.INDEX_SEP) {
+			if (reader.NextLine != null && reader.CurrentLine.StartsWith("Index: ") && reader.NextLine == this.INDEX_SEP) {
 				string[] special_header = new string[2];
 				// This is an Index: header, which is common in CVS && Subversion,
 				// amongst other systems.

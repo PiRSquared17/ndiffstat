@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using NDiffStatLib.Utils;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Diagnostics;
 
 namespace NDiffStatLib.DiffParsers
 {
@@ -74,8 +75,8 @@ namespace NDiffStatLib.DiffParsers
 					info["newInfo"] = this.newChangesetId;
 				}
 				Match lineMatch = Regex.Match(
-					@" a/(.*?) b/(.*?)( (copy|rename) from .*)?$",
-					reader.CurrentLine
+					reader.CurrentLine,
+					@" a/(.*?) b/(.*?)( (copy|rename) from .*)?$"
 				);
 				info["origFile"] = lineMatch.Groups[1].Value;
 				info["newFile"] = lineMatch.Groups[2].Value;
