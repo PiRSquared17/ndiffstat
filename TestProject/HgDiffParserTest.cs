@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TestProject
 {
@@ -109,7 +110,7 @@ namespace TestProject
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
 				HgDiffParser parser = new HgDiffParser(sr);
-				List<FileDiff> fileDiffs = parser.parse();
+				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("readme", fileDiffs[0].origFile);
 			}
@@ -127,7 +128,7 @@ namespace TestProject
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
 				HgDiffParser parser = new HgDiffParser(sr);
-				List<FileDiff> fileDiffs = parser.parse();
+				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("bf544ea505f8", fileDiffs[0].origInfo);
 				Assert.AreEqual("readme", fileDiffs[0].origFile);
@@ -148,7 +149,7 @@ namespace TestProject
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
 				HgDiffParser parser = new HgDiffParser(sr);
-				List<FileDiff> fileDiffs = parser.parse();
+				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("356a6127ef19", fileDiffs[0].origInfo);
 				Assert.AreEqual("readme", fileDiffs[0].origFile);
@@ -179,7 +180,7 @@ namespace TestProject
 
 			using (StringReader sr = new StringReader(diffContents)) {
 				HgDiffParser parser = new HgDiffParser(sr);
-				List<FileDiff> fileDiffs = parser.parse();
+				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("356a6127ef19", fileDiffs[0].origInfo);
 				Assert.AreEqual("readme", fileDiffs[0].origFile);
@@ -205,7 +206,7 @@ namespace TestProject
 
 			using (StringReader sr = new StringReader(diffContents)) {
 				HgDiffParser parser = new HgDiffParser(sr);
-				List<FileDiff> fileDiffs = parser.parse();
+				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("bf544ea505f8", fileDiffs[0].origInfo);
 				Assert.AreEqual("path/to file/readme.txt", fileDiffs[0].origFile);

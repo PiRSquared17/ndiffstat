@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NDiffStatLib.DiffParsers;
+using System.Linq;
 
 namespace TestProject
 {
@@ -120,7 +121,7 @@ namespace TestProject
 
 		   using (StringReader sr = new StringReader(diff)) {
 			   SvnDiffParser parser = new SvnDiffParser(sr);
-			   List<FileDiff> fileDiffs = parser.parse();
+			   List<FileDiff> fileDiffs = parser.parse().ToList();
 			   Assert.AreEqual(1, fileDiffs.Count);
 			   Assert.AreEqual("binfile", fileDiffs[0].origFile);
 			   Assert.IsTrue(fileDiffs[0].binary);
@@ -151,7 +152,7 @@ namespace TestProject
 
 		   using (StringReader sr = new StringReader(diff)) {
 			   SvnDiffParser parser = new SvnDiffParser(sr);
-			   List<FileDiff> fileDiffs = parser.parse();
+			   List<FileDiff> fileDiffs = parser.parse().ToList();
 			   Assert.AreEqual(1, fileDiffs.Count);
 			   Assert.AreEqual("Makefile", fileDiffs[0].origFile);
 			   Assert.AreEqual(4, SvnDiffParser.parse_diff_revision("", fileDiffs[0].origInfo).revision.revNumber);

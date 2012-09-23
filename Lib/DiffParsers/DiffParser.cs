@@ -77,12 +77,10 @@ namespace NDiffStatLib.DiffParsers
 	public class DiffParser
 	{
 		private readonly string INDEX_SEP = string.Join("", Enumerable.Repeat('=', 67));
-		private readonly List<FileDiff> files;
 		private readonly TextReader data;
 
 		public DiffParser( TextReader data )
 		{
-			this.files = new List<FileDiff>();
 			this.data = data;
 		}
 
@@ -90,7 +88,7 @@ namespace NDiffStatLib.DiffParsers
 		/// Parses the diff, returning a list of File objects representing each
 		/// file in the diff.
 		/// </summary>
-		public List<FileDiff> parse()
+		public virtual IEnumerable<FileDiff> parse()
 		{
 			Debug.WriteLine("DiffParser.parse: Beginning parse of diff");
 
@@ -101,17 +99,16 @@ namespace NDiffStatLib.DiffParsers
 				FileDiff new_file = this.parse_change_header(reader);
 				if (new_file != null) {
 					// This line is the start of a new file diff.
+					if (currentFile != null) yield return currentFile;
 					currentFile = new_file;
-					this.files.Add(currentFile);
 				} else {
 					if (currentFile != null) {
 						currentFile.WriteLine(reader.CurrentLine);
 					}
 				}
 			}
+			if (currentFile != null) yield return currentFile;
 			Debug.WriteLine("DiffParser.parse: Finished parsing diff.");
-
-			return this.files;
 		}
 
 		///<summary>
