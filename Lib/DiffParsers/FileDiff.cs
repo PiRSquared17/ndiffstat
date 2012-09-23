@@ -8,7 +8,6 @@ namespace NDiffStatLib.DiffParsers
 {
 	public class FileDiff : TextWriter
 	{
-
 		public string origFile;
 		public string newFile;
 		public string origInfo;
@@ -36,14 +35,17 @@ namespace NDiffStatLib.DiffParsers
 		{
 			_data.Append(text);
 		}
+
 		public override void WriteLine( string text )
 		{
 			_data.AppendLine(text);
 		}
+
 		public override void WriteLine( string text, params object[] args )
 		{
 			_data.AppendFormat(text + "\r\n", args);
 		}
+
 		public string GetData()
 		{
 			return _data.ToString();
