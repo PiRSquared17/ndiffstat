@@ -51,7 +51,7 @@ namespace NDiffStatLib.DiffParsers
 					currentFile = new_file;
 				} else {
 					if (currentFile != null) {
-						currentFile.WriteLine(reader.CurrentLine);
+						currentFile.WriteLine(reader.CurrentLine, isHeader: false);
 					}
 				}
 			}
@@ -98,7 +98,7 @@ namespace NDiffStatLib.DiffParsers
 					    ||(i + 1 < headerLines.Length && line.StartsWith("Index: ") && headerLines[i + 1] == this.INDEX_SEP)) {
 
 						// This is a valid part of a diff header. Add it.
-						fileDiff.WriteLine(line);
+						fileDiff.WriteLine(line, isHeader: true);
 					}
 				}
 			}

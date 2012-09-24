@@ -34,7 +34,7 @@ namespace NDiffStatLib.DiffParsers
 		}
 	}
 
-	public abstract class FileDiff : TextWriter
+	public abstract class FileDiff
 	{
 		public string origFile;
 		public string newFile;
@@ -57,19 +57,14 @@ namespace NDiffStatLib.DiffParsers
 			this.moved = false;
 		}
 
-		public override Encoding Encoding
-		{
-			get { throw new NotImplementedException(); }
-		}
+		public abstract void WriteLine( string text, bool isHeader );
 	}
 
 	public class MockFileDiff : FileDiff
 	{
 		public MockFileDiff() : base() { }
 
-		public override void Write( string text ) { }
-
-		public override void WriteLine( string text ) { }
+		public override void WriteLine( string text, bool isHeader ) { }
 	}
 
 	public class FileDiffWithCounter : FileDiff
@@ -81,12 +76,11 @@ namespace NDiffStatLib.DiffParsers
 			this.statsCounter = new StatsCounter(merge_opt);
 		}
 
-		public override void Write( string text ) {
-			throw new NotImplementedException();
-		}
+		public override void WriteLine( string text, bool isHeader ) {
 
-		public override void WriteLine( string text ) {
-
+			if (isHeader) {
+				return;
+			}
 			if (text.StartsWith("+") && !text.StartsWith("+++ ")) {
 				statsCounter.LineFound(LinesType.added);
 			} else if (text.StartsWith("-") && !text.StartsWith("--- ")) {
