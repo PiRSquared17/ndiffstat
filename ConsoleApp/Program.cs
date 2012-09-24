@@ -16,12 +16,12 @@ namespace ConsoleApp
 			string fileName = null;
 			int i=-1;
 			while (++i < args.Length) {
-				if (args[i] == "/?" || args[i] == "--help") {
+				if (args[i].In("/?", "--help")) {
 					DisplayUsage();
 					return;
 				} 
-				if (args[i] == "-m") options.merge_opt = true;
-				else if (args[i] == "-f") {
+				if (args[i].In("-m", "/m")) options.merge_opt = true;
+				else if (args[i].In("-f", "/f")) {
 					options.format_opt = (FormatOption)int.Parse(args[i+1]);
 					++i;
 				} else if (args[i].Length == 2 && args[i][0] == '-') {
