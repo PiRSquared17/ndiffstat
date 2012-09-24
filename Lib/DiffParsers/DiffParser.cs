@@ -21,11 +21,7 @@ namespace NDiffStatLib.DiffParsers
 		private readonly CustomTextReader reader;
 		private readonly FileDiffFactory fileDiffFactory;
 
-		public DiffParser( TextReader data, FileDiffFactory fileDiffFactory )
-		{
-			this.reader = new CustomTextReader(data);
-			this.fileDiffFactory = fileDiffFactory;
-		}
+		public DiffParser( TextReader data, FileDiffFactory fileDiffFactory ) : this(new CustomTextReader(data), fileDiffFactory) {}
 
 		public DiffParser( CustomTextReader reader, FileDiffFactory fileDiffFactory )
 		{
