@@ -7,8 +7,21 @@ using NDiffStatLib.Utils;
 namespace NDiffStatLib
 {
 	public enum LinesType {
+		/// <summary>
+		/// added line ("+blah...");
+		/// </summary>
 		added,
+		/// <summary>
+		/// removed line ("-bloh...");
+		/// </summary>
 		removed,
+		/// <summary>
+		/// lines of kind "\ No newline at end of file"
+		/// </summary>
+		noNewLine,
+		/// <summary>
+		/// All lines except those identified in this enum
+		/// </summary>
 		others
 	}
 	
@@ -48,6 +61,8 @@ namespace NDiffStatLib
 					break;
 				case LinesType.removed:
 					this.tempStats.removes++;
+					break;
+				case LinesType.noNewLine:
 					break;
 				case LinesType.others:
 					ClearTempStats();
