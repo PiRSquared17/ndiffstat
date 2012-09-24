@@ -109,32 +109,21 @@ namespace TestProject
 			Assert.AreEqual("une", reader.PreviousLine);
 			Assert.AreEqual("chaîne", reader.CurrentLine);
 			Assert.IsNull(reader.NextLine);
+			// currentLine is the 4th line 
+			Assert.AreEqual(4, reader.CurrentLineIndex); 
 
-			Assert.AreEqual(4, reader.CurrentLineIndex); // currentLine is the 4th line 
-
-			// one last step foward
+			// try one more step foward
 			foward = reader.MoveFoward();
-			Assert.IsTrue(foward);
-
-			// (PreviousLine, CurrentLine, NextLine) = (chaîne, null, null)
-			Assert.AreEqual("chaîne", reader.PreviousLine);
-			Assert.IsNull(reader.CurrentLine);
-			Assert.IsNull(reader.NextLine);
-
-			Assert.AreEqual(5, reader.CurrentLineIndex); 
-
-			// the rule is that we cannot move forward when CurrentLine is null
-			// and there's no more lines to read
-			foward = reader.MoveFoward();
+			// MoveFoward should return false as NextLine = null (there's no more lines to read)
 			Assert.IsFalse(foward);
 
-			// (PreviousLine, CurrentLine, NextLine) = (chaîne, null, null)
+			// (PreviousLine, CurrentLine, NextLine) = (une, chaîne, null)
 			// (same as before)
-			Assert.AreEqual("chaîne", reader.PreviousLine);
-			Assert.IsNull(reader.CurrentLine);
+			Assert.AreEqual("une", reader.PreviousLine);
+			Assert.AreEqual("chaîne", reader.CurrentLine);
 			Assert.IsNull(reader.NextLine);
-
-			Assert.AreEqual(5, reader.CurrentLineIndex); 
+			// currentLine is always the 4th line 
+			Assert.AreEqual(4, reader.CurrentLineIndex);
 		}
 	}
 }

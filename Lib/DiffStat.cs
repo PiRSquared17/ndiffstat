@@ -6,22 +6,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NDiffStatLib.Utils;
 using System.Diagnostics;
+using NDiffStatLib.DiffParsers;
 
 namespace NDiffStatLib
 {
-	public enum DiffFormat
-	{
-		unknown,
-		/// <summary>
-		/// Format de diff tels que générés par la commande "hg diff" dans Mercurial
-		/// </summary>
-		hgDiff,
-		/// <summary>
-		/// Format de diff généré par Subversion (svn diff)
-		/// </summary>
-		svnDiff
-	}; 
-	
 	public class DiffStat
 	{
 		/// <summary>
@@ -30,7 +18,6 @@ namespace NDiffStatLib
 		public const int DEFAULT_MAX_WIDTH = 80;
 
 		private readonly DiffStatOptions options;
-		private DiffFormat diffFormat;
 		public int longuestNameLength
 		{
 			get
@@ -60,7 +47,7 @@ namespace NDiffStatLib
 			get { return fileStats.Values.Sum(fileStat => fileStat.modifs); }
 		}
 		
-		private Dictionary<string, FileStat> fileStats = new Dictionary<string, FileStat>();
+		private Dictionary<string, StatsCounter> fileStats = new Dictionary<string, StatsCounter>();
 
 		/// <summary>
 		/// Constructs a new objet DiffStat and parse the contents of the TextReader
@@ -72,79 +59,38 @@ namespace NDiffStatLib
 		}
 
 		private void ParseDiff( TextReader lines )
-		{	
-			RegexOptions options = RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.ExplicitCapture;
-			// Hg diff format
-			// e.g. --- a/path_to_file	Fri Sep 07 18:14:51 2012 +0200
-			Regex regHgSourceTargetFile = new Regex(@"^(?<prefix>---|\+\+\+) ([ab]/)?(?<fileName>.+?)\t(.+)$", options);
-			// Svn diff format
-			// e.g. --- path_to_file		(revision xxx)
-			Regex regSvnSourceTargetFile = new Regex(@"^(?<prefix>---|\+\+\+) (?<fileName>.+?)\t\(revision (?<revision>\d+)\)$", options);
-
-			// Regex regChunkHeader = new Regex(@"^@@ -(?<sourceStart>\d+)(?:,(?<sourceLength>\d+))? \+(?<targetStart>\d+)(?:,(?<targetLength>\d+))?\ @@");
-
-			FileStat currentFS = null;
-			string line;
-			int lineCount = 0;
-			while ((line = lines.ReadLine()) != null) {
-				lineCount++;
-				bool line_added = line.StartsWith("+") && !line.StartsWith("+++ ");
-				bool line_deleted = line.StartsWith("-") && !line.StartsWith("--- ");
-				if ((line_added || line_deleted) && currentFS == null) {
-					// if whe find a line begining with '+' or '-' and we don't know witch file its refers to, something turned wrong
-					throw new Exception(string.Format("Error : fileName couldn't be parsed in lines 0-{0}", lineCount));
-				} else if (line_added) {
-					currentFS.LineFound(LinesType.added);
-				} else if (line_deleted) {
-					currentFS.LineFound(LinesType.removed);
-				} else {
-					if (currentFS != null) {
-						currentFS.LineFound(LinesType.others);
-					}
-					if (line.StartsWith("+++ ") || line.StartsWith("--- ")) {
-						if (this.diffFormat == DiffFormat.unknown || this.diffFormat == DiffFormat.hgDiff) {
-							Match match = regHgSourceTargetFile.Match(line);
-							if (match.Success) {
-								this.diffFormat = DiffFormat.hgDiff;
-								if (match.Groups["prefix"].Value == "---") {
-									AddStats(currentFS);
-									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
-								} else if (currentFS != null && currentFS.fileName == "/dev/null" && match.Groups["prefix"].Value == "+++") {
-									// cas d'un nouveau fichier. Dans ce cas a lu "/dev/null" comme nom du fichier lors du parsing de la ligne "--- "
-									// --> on recrée un nouvel objet FileStat avec le bon nom de fichier
-									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
-								}
-							}
-						}
-						if (this.diffFormat == DiffFormat.unknown || this.diffFormat == DiffFormat.svnDiff) {
-							Match match = regSvnSourceTargetFile.Match(line);
-							if (match.Success) {
-								this.diffFormat = DiffFormat.svnDiff;
-								if (currentFS == null && match.Groups["prefix"].Value == "---") {
-									AddStats(currentFS);
-									currentFS = new FileStat(match.Groups["fileName"].Value, this.options.merge_opt);
-								}
-							}
-						}
-						if (line.StartsWith("--- ") && currentFS == null) {
-							throw new Exception(string.Format("unrecognized line pattern (line no. {0}) :\r\n{1}", lineCount, line));
-						}
-					}
-				}
-			}
-			if (currentFS != null) {
-				currentFS.ClearTempStats();
-				AddStats(currentFS);
+		{
+			CustomTextReader reader = new CustomTextReader(lines);
+			FileDiffWithCounterFactory factory = new FileDiffWithCounterFactory(options.merge_opt);
+			DiffParser diffParser = GetDiffParser(reader, factory);
+			foreach (FileDiff fileDiff in diffParser.parse()) {
+				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
+				AddStats(fileName, ((FileDiffWithCounter)fileDiff).statsCounter);
 			}
 		}
 
-		private void AddStats(FileStat fileStat) {
-			if (fileStat == null) return;
-			FileStat existingFileStat;
-			if (fileStats.TryGetValue(fileStat.fileName, out existingFileStat)) {
+		private DiffParser GetDiffParser(CustomTextReader reader, FileDiffWithCounterFactory factory)
+		{
+			
+			string firstLine = reader.NextLine;
+			// very basic test to find diff format
+			if (firstLine == null) {
+				throw new DiffParserError("Diff is empty", 0);
+			} else if (firstLine.StartsWith("Index: ")) {
+				return new SvnDiffParser(reader, factory);
+			} else if (firstLine.StartsWith("# ") || firstLine.StartsWith("diff ")) {
+				return new HgDiffParser(reader, factory);
+			} else {
+				return new DiffParser(reader, factory);
+			}
+		}
+
+		private void AddStats(string fileName, StatsCounter fileStat) {
+			StatsCounter existingFileStat;
+			if (fileStats.TryGetValue(fileName, out existingFileStat)) {
 				existingFileStat.SumWith(fileStat);
 			} else {
-				fileStats.Add(fileStat.fileName, fileStat);
+				fileStats.Add(fileName, fileStat);
 			}
 		}
 
@@ -172,11 +118,11 @@ namespace NDiffStatLib
 			StringBuilder output = new StringBuilder();
 
 			int modifiedFilesCount = 0;
-			foreach (FileStat fileStat in this.fileStats.Values.Where(fs => fs.total > 0).OrderBy(fs => fs.fileName, StringComparer.Ordinal)) {
+			foreach (var fileStat in this.fileStats.OrderBy(fs => fs.Key, StringComparer.Ordinal).Where(fs => fs.Value.total > 0)) {
 				string formatStr = " {0,-" + longuestNameLength + "} |";
-				output.AppendFormat(formatStr, fileStat.fileName);
-				OutputArrayData(fileStat, output, maxChangeCountWidth);
-				OutputHistogram(fileStat, output, histogramScale);
+				output.AppendFormat(formatStr, fileStat.Key);
+				OutputArrayData(fileStat.Key, fileStat.Value, output, maxChangeCountWidth);
+				OutputHistogram(fileStat.Key, fileStat.Value, output, histogramScale);
 				output.AppendLine();
 				modifiedFilesCount++;
 			}
@@ -195,7 +141,7 @@ namespace NDiffStatLib
 			return output.ToString();
 		}
 
-		public void OutputArrayData( FileStat fileStat, StringBuilder output, int numberWidth )
+		public void OutputArrayData( string fileName, StatsCounter fileStat, StringBuilder output, int numberWidth )
 		{
 			string strFormat = "{0," + numberWidth + "} ";
 			output.AppendFormat(strFormat, fileStat.total);
@@ -208,7 +154,7 @@ namespace NDiffStatLib
 			}
 		}
 
-		public void OutputHistogram( FileStat fileStat, StringBuilder output, double scale )
+		public void OutputHistogram( string fileName, StatsCounter fileStat, StringBuilder output, double scale )
 		{	
 			// since we could only display an integer number of symbols {+,-,!} the bar could be visibly shorter than we expect
 			// to avoid too much difference, we report the error (delta) resulting of the "floor" operation on subsequent steps

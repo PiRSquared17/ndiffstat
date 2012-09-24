@@ -68,22 +68,18 @@ namespace NDiffStatLib.DiffParsers
 		}
 
 		/// <summary>
-		/// Avance d'une ligne dans le texte et renvoie true si CurrentLine ou NextLine est non null
+		/// Avance d'une ligne dans le texte et renvoie true si NextLine est non null
 		/// Ne fait rien sinon et retourne false
 		/// </summary>
 		/// <returns></returns>
 		public bool MoveFoward()
 		{
-			if (lastLineRead == null && linesBuffer.ElementAt(1) == null) {
+			if (lastLineRead == null) {
 				return false;
 			}
 			linesBuffer.Dequeue();
-			if (lastLineRead == null) {
-				linesBuffer.Enqueue(null);
-			} else {
-				lastLineRead = reader.ReadLine();
-				linesBuffer.Enqueue(lastLineRead);
-			}
+			lastLineRead = reader.ReadLine();
+			linesBuffer.Enqueue(lastLineRead);
 			currentLineIndex++;
 			return true;
 		}

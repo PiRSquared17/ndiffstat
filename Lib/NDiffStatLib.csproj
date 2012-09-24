@@ -46,7 +46,7 @@
     <Compile Include="DiffParsers\Revision.cs" />
     <Compile Include="DiffParsers\SvnDiffParser.cs" />
     <Compile Include="DiffStat.cs" />
-    <Compile Include="FileStat.cs" />
+    <Compile Include="StatsCounter.cs" />
     <Compile Include="Utils\CalcUtils.cs" />
     <Compile Include="DiffStatOptions.cs" />
     <Compile Include="Utils\FileUtils.cs" />

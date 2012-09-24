@@ -35,7 +35,9 @@ namespace NDiffStatLib.DiffParsers
 
 		const string BINARY_STRING = "Cannot display: file marked as a binary type.";
 
-		public SvnDiffParser( TextReader data ) : base(data) { }
+		public SvnDiffParser( TextReader data, FileDiffFactory fileDiffFactory ) : base(data, fileDiffFactory) { }
+
+		public SvnDiffParser( CustomTextReader reader, FileDiffFactory fileDiffFactory ) : base(reader, fileDiffFactory) { }
 
 		protected override void parse_special_header( CustomTextReader reader, NameValueCollection info, StringBuilder sbHeader )
 		{

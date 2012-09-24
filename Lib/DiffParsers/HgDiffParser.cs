@@ -21,7 +21,9 @@ namespace NDiffStatLib.DiffParsers
 		public string origChangesetId = null;
 		public bool isGitDiff = false;
 
-		public HgDiffParser( TextReader text ) : base(text) { }
+		public HgDiffParser( TextReader text, FileDiffFactory fileDiffFactory ) : base(text, fileDiffFactory) { }
+
+		public HgDiffParser( CustomTextReader reader, FileDiffFactory fileDiffFactory ) : base(reader, fileDiffFactory) { }
 
 		protected override void parse_special_header( CustomTextReader reader, NameValueCollection info, StringBuilder sbHeader )
 		{

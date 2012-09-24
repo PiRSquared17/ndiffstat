@@ -18,22 +18,29 @@ namespace NDiffStatLib.DiffParsers
 	public class DiffParser
 	{
 		private readonly string INDEX_SEP = string.Join("", Enumerable.Repeat('=', 67));
-		private readonly TextReader data;
+		private readonly CustomTextReader reader;
+		private readonly FileDiffFactory fileDiffFactory;
 
-		public DiffParser( TextReader data )
+		public DiffParser( TextReader data, FileDiffFactory fileDiffFactory )
 		{
-			this.data = data;
+			this.reader = new CustomTextReader(data);
+			this.fileDiffFactory = fileDiffFactory;
+		}
+
+		public DiffParser( CustomTextReader reader, FileDiffFactory fileDiffFactory )
+		{
+			this.reader = reader;
+			this.fileDiffFactory = fileDiffFactory;
 		}
 
 		/// <summary>
 		/// Parses the diff, returning a list of File objects representing each
 		/// file in the diff.
 		/// </summary>
-		public virtual IEnumerable<FileDiff> parse()
+		public IEnumerable<FileDiff> parse()
 		{
 			Debug.WriteLine("DiffParser.parse: Beginning parse of diff");
 
-			CustomTextReader reader = new CustomTextReader(data);
 			FileDiff currentFile = null;
 			// Go through each line in the diff, looking for diff headers.
 			while (reader.MoveFoward()) {
@@ -58,7 +65,6 @@ namespace NDiffStatLib.DiffParsers
 		///<summary>
 		private FileDiff parse_change_header( CustomTextReader reader )
 		{
-
 			NameValueCollection info = new NameValueCollection();
 			FileDiff fileDiff = null;
 			int start = reader.CurrentLineIndex;
@@ -70,7 +76,7 @@ namespace NDiffStatLib.DiffParsers
 			// file to return.
 			if (info.AllKeys.Contains("origFile") && info.AllKeys.Contains("newFile") && 
 			   info.AllKeys.Contains("origInfo") && info.AllKeys.Contains("newInfo")) {
-				fileDiff = new FileDiff();
+				fileDiff = fileDiffFactory.Create();
 				if (info["binary"] != null) fileDiff.binary = bool.Parse(info["binary"]);
 				if (info["deleted"] != null) fileDiff.deleted  = bool.Parse(info["deleted"]);
 				fileDiff.origFile = info["origFile"];

@@ -109,7 +109,7 @@ namespace TestProject
 				+ "--- /dev/null\n" 
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
-				HgDiffParser parser = new HgDiffParser(sr);
+				HgDiffParser parser = new HgDiffParser(sr, new MockFileDiffFactory());
 				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("readme", fileDiffs[0].origFile);
@@ -127,7 +127,7 @@ namespace TestProject
 				+ "--- a/readme\n" 
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
-				HgDiffParser parser = new HgDiffParser(sr);
+				HgDiffParser parser = new HgDiffParser(sr, new MockFileDiffFactory());
 				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("bf544ea505f8", fileDiffs[0].origInfo);
@@ -148,7 +148,7 @@ namespace TestProject
 				+ "--- a/readme\n" 
 				+ "+++ b/readme\n";
 			using (StringReader sr = new StringReader(diffContents)) {
-				HgDiffParser parser = new HgDiffParser(sr);
+				HgDiffParser parser = new HgDiffParser(sr, new MockFileDiffFactory());
 				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("356a6127ef19", fileDiffs[0].origInfo);
@@ -179,7 +179,7 @@ namespace TestProject
 				+  "+++ b/readme\n";
 
 			using (StringReader sr = new StringReader(diffContents)) {
-				HgDiffParser parser = new HgDiffParser(sr);
+				HgDiffParser parser = new HgDiffParser(sr, new MockFileDiffFactory());
 				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("356a6127ef19", fileDiffs[0].origInfo);
@@ -205,7 +205,7 @@ namespace TestProject
 				+  "+++ b/new/path to/readme.txt\n";
 
 			using (StringReader sr = new StringReader(diffContents)) {
-				HgDiffParser parser = new HgDiffParser(sr);
+				HgDiffParser parser = new HgDiffParser(sr, new MockFileDiffFactory());
 				List<FileDiff> fileDiffs = parser.parse().ToList();
 				Assert.AreEqual(1, fileDiffs.Count);
 				Assert.AreEqual("bf544ea505f8", fileDiffs[0].origInfo);

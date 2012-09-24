@@ -120,7 +120,7 @@ namespace TestProject
 			   + "binary type.\nsvn:mime-type = application/octet-stream\n";
 
 		   using (StringReader sr = new StringReader(diff)) {
-			   SvnDiffParser parser = new SvnDiffParser(sr);
+			   SvnDiffParser parser = new SvnDiffParser(sr, new MockFileDiffFactory());
 			   List<FileDiff> fileDiffs = parser.parse().ToList();
 			   Assert.AreEqual(1, fileDiffs.Count);
 			   Assert.AreEqual("binfile", fileDiffs[0].origFile);
@@ -151,7 +151,7 @@ namespace TestProject
 			+ " OUTNAME = svn-misc-docs\n";
 
 		   using (StringReader sr = new StringReader(diff)) {
-			   SvnDiffParser parser = new SvnDiffParser(sr);
+			   SvnDiffParser parser = new SvnDiffParser(sr, new MockFileDiffFactory());
 			   List<FileDiff> fileDiffs = parser.parse().ToList();
 			   Assert.AreEqual(1, fileDiffs.Count);
 			   Assert.AreEqual("Makefile", fileDiffs[0].origFile);

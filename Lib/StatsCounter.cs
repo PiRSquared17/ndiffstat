@@ -12,9 +12,8 @@ namespace NDiffStatLib
 		others
 	}
 	
-	public class FileStat
+	public class StatsCounter
 	{
-		public readonly string fileName;
 		private readonly bool merge_opt;
 		public int adds { get; private set; }
 		public int removes { get; private set; }
@@ -31,11 +30,10 @@ namespace NDiffStatLib
 			get { return adds + removes + modifs; }
 		}
 
-		public FileStat( string fileName, bool merge_opt ) : this(fileName, merge_opt, 0, 0, 0) { }
+		public StatsCounter( bool merge_opt ) : this(merge_opt, 0, 0, 0) { }
 
-		public FileStat( string fileName, bool merge_opt, int adds, int removes, int modifs )
+		public StatsCounter( bool merge_opt, int adds, int removes, int modifs )
 		{
-			this.fileName = fileName;
 			this.merge_opt = merge_opt;
 			this.adds = adds;
 			this.removes = removes;
@@ -63,11 +61,8 @@ namespace NDiffStatLib
 		/// Add the corresponding counters of other in current object
 		/// </summary>
 		/// <param name="other"></param>
-		public void SumWith( FileStat other )
+		public void SumWith( StatsCounter other )
 		{
-			if (this.fileName != other.fileName) {
-				throw new Exception("FileStat.Add cannot add files with differents names");
-			}
 			this.adds += other.adds;
 			this.removes += other.removes;
 			this.modifs += other.modifs;
