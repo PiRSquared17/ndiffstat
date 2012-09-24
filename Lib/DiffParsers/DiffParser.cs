@@ -35,7 +35,7 @@ namespace NDiffStatLib.DiffParsers
 		/// </summary>
 		public IEnumerable<FileDiff> parse()
 		{
-			Debug.WriteLine("DiffParser.parse: Beginning parse of diff");
+			Debug.WriteLine(string.Format("{0}.parse: Beginning parse of diff", this.GetType().Name));
 
 			FileDiff currentFile = null;
 			// Go through each line in the diff, looking for diff headers.
@@ -52,7 +52,7 @@ namespace NDiffStatLib.DiffParsers
 				}
 			}
 			if (currentFile != null) yield return currentFile;
-			Debug.WriteLine("DiffParser.parse: Finished parsing diff.");
+			Debug.WriteLine(string.Format("{0}.parse: Finished parsing diff.", this.GetType().Name));
 		}
 
 		///<summary>
