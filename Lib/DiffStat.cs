@@ -156,7 +156,7 @@ namespace NDiffStatLib
 			if (!this.options.merge_opt) Debug.Assert(total_modifs == 0);
 			int maxtotal = this.maxtotal;
 			int longuestNameLength = this.longuestNameLength;
-			if (this.total_adds == 0 && this.total_removes == 0) return "0 files changes";
+			if (this.total_adds == 0 && this.total_removes == 0 && this.total_modifs == 0) return "0 files changes";
 
 			// Work out widths
 			int maxChangeCountWidth = CalcUtils.Max(maxtotal.ToString().Length, 5);
