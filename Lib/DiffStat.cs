@@ -17,7 +17,7 @@ namespace NDiffStatLib
 		/// </summary>
 		public const int DEFAULT_MAX_WIDTH = 80;
 
-		private readonly DiffStatOptions options;
+		public readonly DiffStatOptions options;
 		public int longuestNameLength
 		{
 			get
@@ -65,13 +65,14 @@ namespace NDiffStatLib
 			DiffParser diffParser = GetDiffParser(reader, factory);
 			foreach (FileDiff fileDiff in diffParser.parse()) {
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
-				AddStats(fileName, ((FileDiffWithCounter)fileDiff).statsCounter);
+				StatsCounter counter = ((FileDiffWithCounter)fileDiff).statsCounter;
+				counter.ClearTempStats();
+				AddStats(fileName, counter);
 			}
 		}
 
 		private DiffParser GetDiffParser(CustomTextReader reader, FileDiffWithCounterFactory factory)
 		{
-			
 			string firstLine = reader.NextLine;
 			// very basic test to find diff format
 			if (firstLine == null) {
@@ -116,7 +117,6 @@ namespace NDiffStatLib
 			double histogramScale = Math.Min((double)graphWidth / maxtotal, 1d);
 
 			StringBuilder output = new StringBuilder();
-
 			int modifiedFilesCount = 0;
 			foreach (var fileStat in this.fileStats.OrderBy(fs => fs.Key, StringComparer.Ordinal).Where(fs => fs.Value.total > 0)) {
 				string formatStr = " {0,-" + longuestNameLength + "} |";
