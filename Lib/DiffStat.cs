@@ -30,24 +30,28 @@ namespace NDiffStatLib
 		{
 			get
 			{
-				if (fileStats.Any()) { return fileStats.Values.Max(fileStat => fileStat.total);	} 
+				if (fileStats.Any()) { return fileStats.Values.Max(fileStat => fileStat.statsCounter.total);	} 
 				else { return 0; }
 			}
 		}
 		public int total_adds
 		{
-			get { return fileStats.Values.Sum(fileStat => fileStat.adds); }
+			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.adds); }
 		}
 		public int total_removes
 		{
-			get { return fileStats.Values.Sum(fileStat => fileStat.removes); }
+			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.removes); }
 		}
 		public int total_modifs
 		{
-			get { return fileStats.Values.Sum(fileStat => fileStat.modifs); }
+			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.modifs); }
 		}
-		
-		private Dictionary<string, StatsCounter> fileStats = new Dictionary<string, StatsCounter>();
+		public IEnumerable<FileDiffWithCounter> FileStats
+		{
+			get { return fileStats.Values; }
+		}
+
+		private Dictionary<string, FileDiffWithCounter> fileStats = new Dictionary<string, FileDiffWithCounter>();
 
 		/// <summary>
 		/// Constructs a new objet DiffStat and parse the contents of the TextReader
@@ -65,9 +69,9 @@ namespace NDiffStatLib
 			DiffParser diffParser = GetDiffParser(reader, factory);
 			foreach (FileDiff fileDiff in diffParser.parse()) {
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
-				StatsCounter counter = ((FileDiffWithCounter)fileDiff).statsCounter;
-				counter.ClearTempStats();
-				AddStats(fileName, counter);
+				FileDiffWithCounter fileDiffWC =  (FileDiffWithCounter)fileDiff;
+				fileDiffWC.statsCounter.ClearTempStats();
+				AddStats(fileName, fileDiffWC);
 			}
 		}
 
@@ -86,10 +90,11 @@ namespace NDiffStatLib
 			}
 		}
 
-		private void AddStats(string fileName, StatsCounter fileStat) {
-			StatsCounter existingFileStat;
+		private void AddStats( string fileName, FileDiffWithCounter fileStat )
+		{
+			FileDiffWithCounter existingFileStat;
 			if (fileStats.TryGetValue(fileName, out existingFileStat)) {
-				existingFileStat.SumWith(fileStat);
+				existingFileStat.statsCounter.SumWith(fileStat.statsCounter);
 			} else {
 				fileStats.Add(fileName, fileStat);
 			}
@@ -118,11 +123,11 @@ namespace NDiffStatLib
 
 			StringBuilder output = new StringBuilder();
 			int modifiedFilesCount = 0;
-			foreach (var fileStat in this.fileStats.OrderBy(fs => fs.Key, StringComparer.Ordinal).Where(fs => fs.Value.total > 0)) {
+			foreach (var fileStat in this.fileStats.OrderBy(fs => fs.Key, StringComparer.Ordinal).Where(fs => fs.Value.statsCounter.total > 0)) {
 				string formatStr = " {0,-" + longuestNameLength + "} |";
 				output.AppendFormat(formatStr, fileStat.Key);
-				OutputArrayData(fileStat.Key, fileStat.Value, output, maxChangeCountWidth);
-				OutputHistogram(fileStat.Key, fileStat.Value, output, histogramScale);
+				OutputArrayData(fileStat.Key, fileStat.Value.statsCounter, output, maxChangeCountWidth);
+				OutputHistogram(fileStat.Key, fileStat.Value.statsCounter, output, histogramScale);
 				output.AppendLine();
 				modifiedFilesCount++;
 			}
