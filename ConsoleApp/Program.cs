@@ -48,7 +48,7 @@ namespace ConsoleApp
 					return;
 				}
 				using (FileStream fs = FileUtils.GetReadonlyStream(file.FullName)) {
-					using (StreamReader sr = new StreamReader(fs, true)) {
+					using (StreamReader sr = new StreamReader(fs, Encoding.Default)) {
 						DiffStat diffStat = new DiffStat(sr, options);
 						Console.WriteLine(diffStat.ToString());
 					}
