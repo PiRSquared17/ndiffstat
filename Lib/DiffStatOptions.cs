@@ -24,5 +24,10 @@ namespace NDiffStatLib
 		/// format (0=concise, 1=normal, 2=filled, 4=values) (-f)
 		/// </summary>
 		public FormatOption format_opt = FormatOption.normal;
+		/// <summary>
+		/// regex pattern which allows to exclude specifics files from diff
+		/// </summary>
+		public string excluded_files_pattern;
+
 	}
 }

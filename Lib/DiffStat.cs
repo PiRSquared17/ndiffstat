@@ -18,6 +18,7 @@ namespace NDiffStatLib
 		public const int DEFAULT_MAX_WIDTH = 80;
 
 		public readonly DiffStatOptions options;
+		public readonly Regex excludedFilesReg;
 		public int longuestNameLength
 		{
 			get
@@ -59,6 +60,12 @@ namespace NDiffStatLib
 		public DiffStat( TextReader lines, DiffStatOptions options )
 		{
 			this.options = options;
+			if (!options.excluded_files_pattern.IsNullOrEmpty()) {
+				this.excludedFilesReg = new Regex(
+					options.excluded_files_pattern,
+					RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase
+				);
+			}
 			ParseDiff(lines);
 		}
 
@@ -69,6 +76,7 @@ namespace NDiffStatLib
 			DiffParser diffParser = GetDiffParser(reader, factory);
 			foreach (FileDiff fileDiff in diffParser.parse()) {
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
+				if (this.excludedFilesReg != null && excludedFilesReg.IsMatch(fileName)) continue;
 				FileDiffWithCounter fileDiffWC =  (FileDiffWithCounter)fileDiff;
 				fileDiffWC.statsCounter.ClearTempStats();
 				AddStats(fileName, fileDiffWC);
