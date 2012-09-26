@@ -16,9 +16,9 @@ namespace NDiffStatLib
 		/// </summary>
 		removed,
 		/// <summary>
-		/// lines of kind "\ No newline at end of file"
+		/// lines of kind "\ blah..."
 		/// </summary>
-		noNewLine,
+		escaped,
 		/// <summary>
 		/// All lines except those identified in this enum
 		/// </summary>
@@ -62,7 +62,7 @@ namespace NDiffStatLib
 				case LinesType.removed:
 					this.tempStats.removes++;
 					break;
-				case LinesType.noNewLine:
+				case LinesType.escaped:
 					break;
 				case LinesType.others:
 					ClearTempStats();

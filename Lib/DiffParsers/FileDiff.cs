@@ -85,8 +85,8 @@ namespace NDiffStatLib.DiffParsers
 				statsCounter.LineFound(LinesType.added);
 			} else if (text.StartsWith("-") && !text.StartsWith("--- ")) {
 				statsCounter.LineFound(LinesType.removed);
-			} else if (text == "\\ No newline at end of file") {
-				statsCounter.LineFound(LinesType.noNewLine);
+			} else if (text.StartsWith("\\ ")) {
+				statsCounter.LineFound(LinesType.escaped);
 			} else {
 				statsCounter.LineFound(LinesType.others);
 			}
