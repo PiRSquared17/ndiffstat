@@ -205,14 +205,12 @@ namespace NDiffStatLib.DiffParsers
 	{
 		public int linenum;
 
-		public DiffParserError( string msg, int linenum, Exception innerException )
-			: base(msg, innerException)
+		public DiffParserError( string msg, int linenum, Exception innerException ) : base(msg, innerException)
 		{
 			this.linenum = linenum;
 		}
 
-		public DiffParserError( string msg, int linenum )
-			: base(msg)
+		public DiffParserError( string msg, int linenum ) : base(msg)
 		{
 			this.linenum = linenum;
 		}
