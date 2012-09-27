@@ -88,7 +88,7 @@ namespace NDiffStatLib
 			string firstLine = reader.NextLine;
 			// very basic test to find diff format
 			if (firstLine == null) {
-				throw new DiffParserError("Diff is empty", 0);
+				throw new EmptyDiffException();
 			} else if (firstLine.StartsWith("Index: ")) {
 				return new SvnDiffParser(reader, factory);
 			} else if (firstLine.StartsWith("# ") || firstLine.StartsWith("diff ")) {
@@ -194,5 +194,9 @@ namespace NDiffStatLib
 			}
 		}
 	}
-	
+
+	public class EmptyDiffException : Exception
+	{
+		public EmptyDiffException() : base("Diff is empty") { }
+	}
 }
