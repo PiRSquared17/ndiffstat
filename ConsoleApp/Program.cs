@@ -6,32 +6,50 @@ using NDiffStatLib;
 using System.IO;
 using NDiffStatLib.Utils;
 using System.Threading;
+using Mono.Options;
 
 namespace ConsoleApp
 {
 	class Program
 	{
 		static int Main( string[] args )
-		{
+		{		
 			DiffStatOptions options = new DiffStatOptions();
-			string fileName = null;
-			int i=-1;
-			while (++i < args.Length) {
-				if (args[i].In("/?", "--help")) {
+			bool show_help = false;
+			OptionSet opts = new OptionSet() {
+				{ "m|merge-opt", "true if we merge ins/del as modified", 
+								  v => options.merge_opt = (v != null) },
+				{ "f|format-opt=", "text output formatting options\r\n"
+								+ "1=normal - displays only total changes per file\r\n"
+								+ "4=all values - display added/removed/modified lines counts per file",
+								  new Action<int>(v => options.format_opt = (FormatOption)v) },
+				{ "?|help", "show this message and exit", 
+						     v => show_help = v != null } 
+			};
+			List<string> extra;
+			try {
+				extra = opts.Parse(args);
+			} catch (OptionException e) {
+				DisplayError(e.Message);
+				return 1;
+			}
+
+			foreach (string s in extra.Where(s => s.Length > 0)) {
+				if (s[0].In('-', '/')) {
+					DisplayError("Switch " + s + " not recognized");
 					DisplayUsage();
-					return 0;
-				} 
-				if (args[i].In("-m", "/m")) options.merge_opt = true;
-				else if (args[i].In("-f", "/f")) {
-					options.format_opt = (FormatOption)int.Parse(args[i+1]);
-					++i;
-				} else if (args[i].Length == 2 && args[i][0] == '-') {
-					DisplayError("option " + args[i] + " not recognized");
 					return 1;
-				} else if (fileName == null) {
-					fileName = args[i];
 				}
 			}
+
+			if (show_help) {
+				ShowHelp(opts);
+				return 0;
+			}
+
+			// assume the first non-option arg is the diff fileName
+			string fileName = extra.FirstOrDefault();
+
 			if (fileName != null) {
 				FileInfo file;
 				if (File.Exists(fileName)) {
@@ -84,8 +102,16 @@ namespace ConsoleApp
 
 		public static void DisplayUsage()
 		{
-			string usage = @"Usage : ndiffstat [-m] [-f 4] [DIFF_FILE]";
+			string usage = @"Usage : ndiffstat [-m] [-f 4] DIFF_FILE";
 			Console.WriteLine(usage);
+			
+		}
+
+		public static void ShowHelp( OptionSet opts )
+		{
+			DisplayUsage();
+			Console.WriteLine("Options:");
+			opts.WriteOptionDescriptions(Console.Out);
 		}
 
 		public static void DisplayError( string errorMsg )

@@ -8,20 +8,21 @@ namespace NDiffStatLib
 	[Flags]
 	public enum FormatOption
 	{
-		concise = 0,
 		normal = 1,
-		filled = 2,
-		verbose = 4
+		detailed = 4
 	}
 
 	public class DiffStatOptions
 	{
 		/// <summary>
-		/// merge insert/delete data in chunks as modified-lines (-m)
+		/// count consecutives inserted/deleted lines as modified-lines (-m)
 		/// </summary>
 		public bool merge_opt = false;
 		/// <summary>
-		/// format (0=concise, 1=normal, 2=filled, 4=values) (-f)
+		/// Text output format
+		/// - FormatOption.normal (default)	: displays only total changes per file
+		/// - FormatOption.detailed			: display all counters (lines added, removed, etc.)
+		///									  for each file
 		/// </summary>
 		public FormatOption format_opt = FormatOption.normal;
 		/// <summary>

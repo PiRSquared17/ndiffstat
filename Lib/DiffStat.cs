@@ -158,7 +158,7 @@ namespace NDiffStatLib
 		{
 			string strFormat = "{0," + numberWidth + "} ";
 			output.AppendFormat(strFormat, fileStat.total);
-			if (this.options.format_opt.HasFlag(FormatOption.verbose)) {
+			if (this.options.format_opt.HasFlag(FormatOption.detailed)) {
 				output.AppendFormat(strFormat, fileStat.adds);
 				output.AppendFormat(strFormat, fileStat.removes);
 				if (this.options.merge_opt) {
