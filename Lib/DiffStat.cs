@@ -47,7 +47,7 @@ namespace NDiffStatLib
 		{
 			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.modifs); }
 		}
-		public IEnumerable<FileDiffWithCounter> FileStats
+		public ICollection<FileDiffWithCounter> FileStats
 		{
 			get { return fileStats.Values; }
 		}
