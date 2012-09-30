@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Apache Commons\IO\Wildcards.cs" />
     <Compile Include="DiffParsers\DiffParser.cs" />
     <Compile Include="DiffParsers\FileDiff.cs" />
     <Compile Include="DiffParsers\HgDiffParser.cs" />

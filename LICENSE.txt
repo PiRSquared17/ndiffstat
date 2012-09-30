@@ -5,6 +5,9 @@ Rewiew Board is published under MIT License
 	Copyright (c) 2007  Christian Hammond
 	Copyright (c) 2007  David Trowbridge
 	
+Some other classes translated from Apache Common IO (Apache Licence v2.0)
+	Copyright 2002-2012 The Apache Software Foundation
+	
 The module Mono.Options is licensed under MIT/X11
 	Authors:
 	 Jonathan Pryor <jpryor@novell.com>

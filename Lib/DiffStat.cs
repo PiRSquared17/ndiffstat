@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using NDiffStatLib.Utils;
 using System.Diagnostics;
 using NDiffStatLib.DiffParsers;
+using NDiffStatLib.ApacheCommons.IO;
 
 namespace NDiffStatLib
 {
@@ -18,7 +19,9 @@ namespace NDiffStatLib
 		public const int DEFAULT_MAX_WIDTH = 80;
 
 		public readonly DiffStatOptions options;
-		public readonly Regex excludedFilesReg;
+		/// <summary>
+		/// Lenght of the longuest fileName (relative path)
+		/// </summary>
 		public int longuestNameLength
 		{
 			get
@@ -27,6 +30,9 @@ namespace NDiffStatLib
 				else { return 0; }
 			}
 		}
+		/// <summary>
+		/// Maximum number of changes for a single file
+		/// </summary>
 		public int maxtotal
 		{
 			get
@@ -35,18 +41,30 @@ namespace NDiffStatLib
 				else { return 0; }
 			}
 		}
+		/// <summary>
+		/// Sum of the lines added for all files
+		/// </summary>
 		public int total_adds
 		{
 			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.adds); }
 		}
+		/// <summary>
+		/// Sum of the lines removed for all files
+		/// </summary>
 		public int total_removes
 		{
 			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.removes); }
 		}
+		/// <summary>
+		/// Sum of the lines modified for all files (will be 0 if merge_opt is set to false)
+		/// </summary>
 		public int total_modifs
 		{
 			get { return fileStats.Values.Sum(fileStat => fileStat.statsCounter.modifs); }
 		}
+		/// <summary>
+		/// Collection containing all the data gathered from the diff
+		/// </summary>
 		public ICollection<FileDiffWithCounter> FileStats
 		{
 			get { return fileStats.Values; }
@@ -56,19 +74,19 @@ namespace NDiffStatLib
 
 		/// <summary>
 		/// Constructs a new objet DiffStat and parse the contents of the TextReader
+		/// The TextReader should provide a diff in unified format
 		/// </summary>
 		public DiffStat( TextReader lines, DiffStatOptions options )
 		{
 			this.options = options;
-			if (!options.excluded_files_pattern.IsNullOrEmpty()) {
-				this.excludedFilesReg = new Regex(
-					options.excluded_files_pattern,
-					RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase
-				);
-			}
 			ParseDiff(lines);
 		}
 
+		/// <summary>
+		/// Run the diff analysis. 
+		/// The results can be accessed with <c>FileStats</c> property
+		/// </summary>
+		/// <param name="lines"></param>
 		private void ParseDiff( TextReader lines )
 		{
 			CustomTextReader reader = new CustomTextReader(lines);
@@ -76,13 +94,23 @@ namespace NDiffStatLib
 			DiffParser diffParser = GetDiffParser(reader, factory);
 			foreach (FileDiff fileDiff in diffParser.parse()) {
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
-				if (this.excludedFilesReg != null && excludedFilesReg.IsMatch(fileName)) continue;
+				// check if we should skip file according to inclusion / exclusion list
+				// A file should be skipped if
+				// 1. It is in the exclusion list
+				// 2. It is NOT in the inclusion list
+				if (!Wildcards.WildcardMatchAny(fileName, options.included_files_pattern, true)
+ 					&& Wildcards.WildcardMatchAny(fileName, options.excluded_files_pattern, true)) {
+					continue;
+				}
 				FileDiffWithCounter fileDiffWC =  (FileDiffWithCounter)fileDiff;
 				fileDiffWC.statsCounter.ClearTempStats();
 				AddStats(fileName, fileDiffWC);
 			}
 		}
 
+		/// <summary>
+		/// Basic test to determine the format of the diff (Subversion or Mercurial)
+		/// </summary>
 		private DiffParser GetDiffParser(CustomTextReader reader, FileDiffWithCounterFactory factory)
 		{
 			string firstLine = reader.NextLine;
@@ -98,6 +126,10 @@ namespace NDiffStatLib
 			}
 		}
 
+		/// <summary>
+		/// Add the statistics for a single file to a collection containing
+		/// all previous gathered statistics
+		/// </summary>
 		private void AddStats( string fileName, FileDiffWithCounter fileStat )
 		{
 			FileDiffWithCounter existingFileStat;
@@ -108,6 +140,10 @@ namespace NDiffStatLib
 			}
 		}
 
+		/// <summary>
+		/// Generate a text output from analysis results.
+		/// For each file, a histogram is generated which represents the amount of changes for the file
+		/// </summary>
 		public override string ToString()
 		{
 			int total_adds = this.total_adds;
@@ -154,7 +190,10 @@ namespace NDiffStatLib
 			return output.ToString();
 		}
 
-		public void OutputArrayData( string fileName, StatsCounter fileStat, StringBuilder output, int numberWidth )
+		/// <summary>
+		/// Genereate a ascii-style array which contains changes stats for each file
+		/// </summary>
+		private void OutputArrayData( string fileName, StatsCounter fileStat, StringBuilder output, int numberWidth )
 		{
 			string strFormat = "{0," + numberWidth + "} ";
 			output.AppendFormat(strFormat, fileStat.total);
@@ -167,7 +206,10 @@ namespace NDiffStatLib
 			}
 		}
 
-		public void OutputHistogram( string fileName, StatsCounter fileStat, StringBuilder output, double scale )
+		/// <summary>
+		/// Genereate a ascii-style histogram from the computed data
+		/// </summary>
+		private void OutputHistogram( string fileName, StatsCounter fileStat, StringBuilder output, double scale )
 		{	
 			// since we could only display an integer number of symbols {+,-,!} the bar could be visibly shorter than we expect
 			// to avoid too much difference, we report the error (delta) resulting of the "floor" operation on subsequent steps

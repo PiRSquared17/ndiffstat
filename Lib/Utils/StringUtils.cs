@@ -170,5 +170,53 @@ namespace NDiffStatLib.Utils
 				return true;
 			}
 		}
+
+		/// <summary>
+		/// Tests if two string regions are equal.
+		/// 
+		/// A substring of this <c>String</c> object is compared to a substring
+		/// of the argument other. The result is true if these substrings
+		/// represent identical character sequences. The substring of this
+		/// <c>String</c> object to be compared begins at index <c>toffset</c>
+		/// and has length <c>len</c>. The substring of other to be compared
+		/// begins at index <c>ooffset</c> and has length <c>len</c>. The
+		/// result is <c>false</c> if and only if at least one of the following
+		/// is true:
+		/// * <c>toffset</c> is negative.
+		/// * <c>ooffset</c> is negative.
+		/// * <c>toffset+len</c> is greater than the length of this <c>String</c> object.
+		/// * <c>ooffset+len</c> is greater than the length of the other argument.
+		/// * There is some nonnegative integer <i>k</i> less than <c>len</c> such that:
+		/// <code>s.CharAt(toffset+<i>k</i>) != other.CharAt(ooffset+<i>k</i>)</code>
+		/// </summary>
+		/// <param name="s">reference string</param>
+		/// <param name="toffset">the starting offset of the subregion in reference string</param>
+		/// <param name="other">the string argument</param>
+		/// <param name="ooffset">the starting offset of the subregion in the string argument</param>
+		/// <param name="len">the number of characters to compare</param>
+		/// <returns></returns>
+		public static bool RegionMatches( this string s, int toffset, String other, int ooffset, int len, bool ignoreCase )
+		{
+			// Note: toffset, ooffset, or len might be near -1>>>1.
+			if ((ooffset < 0) || (toffset < 0) || (toffset > (long)s.Length - len)
+            || (ooffset > (long)other.Length - len)) {
+				return false;
+			}
+			while (len-- > 0) {
+				char c1 = s[toffset++];
+				char c2 = other[ooffset++];
+				if (c1 == c2) continue;
+				if (ignoreCase) {
+					// If characters don't match but case may be ignored,
+					// try converting both characters to uppercase.
+					// If the results match, then the comparison scan should continue.
+					if (char.ToUpper(c1) == char.ToUpper(c2)) {
+						continue;
+					}
+				}
+				return false;
+			}
+			return true;
+		}
 	}
 }
