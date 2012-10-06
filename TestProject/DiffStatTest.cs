@@ -88,7 +88,8 @@ namespace TestProject
 			.AppendLine("\\ No newline at end of file");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				Assert.AreEqual(5, diffStat.total_adds);
 				Assert.AreEqual(0, diffStat.total_removes);
 			}
@@ -107,7 +108,8 @@ namespace TestProject
 			.Append("\\ No newline at end of file\n");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				Assert.AreEqual(5, diffStat.total_adds);
 				Assert.AreEqual(0, diffStat.total_removes);
 			}
@@ -138,12 +140,14 @@ namespace TestProject
 			.AppendLine("\\ No newline at end of file");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				ParseDiffModified_CheckStats(diffStat);
 			}
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = true });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = true });
+				diffStat.ParseDiff(sr);
 				ParseDiffModified_CheckStats(diffStat);
 
 			}
@@ -165,12 +169,14 @@ namespace TestProject
 			.Append("\\ No newline at end of file\n");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				ParseDiffModified_CheckStats(diffStat);
 			}
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = true });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = true });
+				diffStat.ParseDiff(sr);
 				ParseDiffModified_CheckStats(diffStat);
 			}
 		}
@@ -210,7 +216,8 @@ namespace TestProject
 			.AppendLine("\\ No newline at end of file");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				Assert.AreEqual(0, diffStat.total_adds);
 				Assert.AreEqual(5, diffStat.total_removes);
 			}
@@ -229,7 +236,8 @@ namespace TestProject
 			.Append("\\ No newline at end of file\n");
 
 			using (StringReader sr = new StringReader(sb.ToString())) {
-				DiffStat diffStat = new DiffStat(sr, new DiffStatOptions() { merge_opt = false });
+				DiffStat diffStat = new DiffStat(new DiffStatOptions() { merge_opt = false });
+				diffStat.ParseDiff(sr);
 				Assert.AreEqual(0, diffStat.total_adds);
 				Assert.AreEqual(5, diffStat.total_removes);
 			}

@@ -76,10 +76,9 @@ namespace NDiffStatLib
 		/// Constructs a new objet DiffStat and parse the contents of the TextReader
 		/// The TextReader should provide a diff in unified format
 		/// </summary>
-		public DiffStat( TextReader lines, DiffStatOptions options )
+		public DiffStat( DiffStatOptions options )
 		{
 			this.options = options;
-			ParseDiff(lines);
 		}
 
 		/// <summary>
@@ -87,7 +86,7 @@ namespace NDiffStatLib
 		/// The results can be accessed with <c>FileStats</c> property
 		/// </summary>
 		/// <param name="lines"></param>
-		private void ParseDiff( TextReader lines )
+		public void ParseDiff( TextReader lines )
 		{
 			CustomTextReader reader = new CustomTextReader(lines);
 			FileDiffWithCounterFactory factory = new FileDiffWithCounterFactory(options.merge_opt);
