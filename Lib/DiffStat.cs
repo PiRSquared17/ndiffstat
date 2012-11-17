@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using NDiffStatLib.Utils;
 using System.Diagnostics;
 using NDiffStatLib.DiffParsers;
-using NDiffStatLib.ApacheCommons.IO;
+using NDiffStatLib.ApacheAnt;
 
 namespace NDiffStatLib
 {
@@ -95,10 +95,10 @@ namespace NDiffStatLib
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
 				// check if we should skip file according to inclusion / exclusion list
 				// A file should be skipped if
-				// 1. It is in the exclusion list
-				// 2. It is NOT in the inclusion list
-				if (!Wildcards.WildcardMatchAny(fileName, options.included_files_pattern, true)
- 					&& Wildcards.WildcardMatchAny(fileName, options.excluded_files_pattern, true)) {
+				// - The inclusion list is not empty AND it is not in the inclusion list
+				// - OR it is in the exclusion list
+				if (options.included_files_pattern.Count > 0 && !SelectorUtils.matchPath(options.included_files_pattern, fileName, isCaseSensitive: false)
+ 					|| SelectorUtils.matchPath(options.excluded_files_pattern, fileName, isCaseSensitive: false)) {
 					continue;
 				}
 				FileDiffWithCounter fileDiffWC =  (FileDiffWithCounter)fileDiff;
