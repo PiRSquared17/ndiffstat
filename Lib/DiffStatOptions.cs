@@ -32,7 +32,7 @@ namespace NDiffStatLib
 		/// --> takes only files contained in a directory named "foo", whose extension is not .txt
 		/// </example>
 		/// </summary>
-		private readonly List<string> included_files_pattern;
+		public readonly List<string> included_files_pattern;
 		/// <summary>
 		/// wildcard pattern which allows to exclude specifics files/folders from stats
 		/// the pattern is matched against the file path relative to the root folder of the diff
