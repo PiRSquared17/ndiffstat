@@ -53,6 +53,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Apache Ants\SelectorUtilsTest.cs" />
     <Compile Include="CustomTextReaderTest.cs" />
     <Compile Include="DiffStatTest.cs" />
     <Compile Include="HgDiffParserTest.cs" />
