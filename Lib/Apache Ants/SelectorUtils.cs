@@ -21,6 +21,11 @@ namespace NDiffStatLib.ApacheAnt
 		/// @since Ant 1.8.0
 		/// </summary>
 		public const string DEEP_TREE_MATCH = "**";
+		/// <summary>
+		/// True if we systematically append ** to paths ending by a directory separator
+		/// as described in NAnt reference documentation (http://nant.sourceforge.net/release/latest/help/types/fileset.html)
+		/// </summary>
+		public bool NormalizePatterns = true;
 		private static readonly SelectorUtils instance = new SelectorUtils();
 
 		/// <summary>
@@ -72,7 +77,7 @@ namespace NDiffStatLib.ApacheAnt
 			if ((str.Length > 0 && FileUtils.IsDirectorySeparator(str[0])) != (pattern.Length > 0 && FileUtils.IsDirectorySeparator(pattern[0]))) {
 				return false;
 			}
-
+			if (this.NormalizePatterns) pattern = normalizePattern(pattern);
 			string[] patDirs = tokenizePathAsArray(pattern);
 			string[] strDirs = tokenizePathAsArray(str);
 			return matchPatternStart(patDirs, strDirs, isCaseSensitive);
@@ -138,6 +143,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <returns><code>true</code> if the pattern matches against the string, or <code>false</code> otherwise.</returns>
 		public bool matchPath( string pattern, string str, bool isCaseSensitive=true )
 		{
+			if (this.NormalizePatterns) pattern = normalizePattern(pattern);
 			string[] patDirs = tokenizePathAsArray(pattern);
 			return matchPath(patDirs, tokenizePathAsArray(str), isCaseSensitive);
 		}
@@ -277,8 +283,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// '?' means one and only one character
 		/// </summary>
 		/// <param name="pattern">The pattern to match against. Must not be <code>null</code>.</param>
-		/// <param name="str">    The string which must be matched against the pattern. Must not be <code>null</code>.</param>
-		///
+		/// <param name="str">The string which must be matched against the pattern. Must not be <code>null</code>.</param>
 		/// <returns><code>true</code> if the string matches against the pattern,
 		///         or <code>false</code> otherwise.</returns>
 		public bool match( string pattern, string str )
@@ -292,19 +297,10 @@ namespace NDiffStatLib.ApacheAnt
 		/// '*' means zero or more characters
 		/// '?' means one and only one character
 		/// </summary>
-		/// <param name="pattern">
-		///		The pattern to match against. Must not be <code>null</code>.
-		/// </param>
-		/// <param name="str">
-		///		The string which must be matched against the pattern. 
-		///		Must not be <code>null</code>.
-		///	</param>
-		/// <param name="caseSensitive">
-		///		Whether or not matching should be performed case sensitively.
-		///	</param>
-		/// <returns>
-		///		<code>true</code> if the string matches against the pattern,
-		///     or <code>false</code> otherwise.
+		/// <param name="pattern">The pattern to match against. Must not be <code>null</code>.</param>
+		/// <param name="str">The string which must be matched against the pattern. Must not be <code>null</code>.</param>
+		/// <param name="caseSensitive">Whether or not matching should be performed case sensitively.</param>
+		/// <returns><code>true</code> if the string matches against the pattern, or <code>false</code> otherwise.
 		/// </returns>
 		public bool match( string pattern, string str, bool caseSensitive )
 		{
@@ -434,7 +430,7 @@ namespace NDiffStatLib.ApacheAnt
 			return allStars(pattern, patIdxStart, patIdxEnd);
 		}
 
-		private static bool allStars( string pattern, int start, int end )
+		private bool allStars( string pattern, int start, int end )
 		{
 			for (int i = start ; i <= end ; ++i) {
 				if (pattern[i] != '*') {
@@ -444,7 +440,7 @@ namespace NDiffStatLib.ApacheAnt
 			return true;
 		}
 
-		private static bool different(
+		private bool different(
 			bool caseSensitive, char ch, char other )
 		{
 			return caseSensitive
@@ -455,7 +451,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <summary>
 		/// Same as {@link #tokenizePath tokenizePath} but hopefully faster.
 		/// </summary>
-		static string[] tokenizePathAsArray( string path )
+		string[] tokenizePathAsArray( string path )
 		{
 			string root = null;
 			if (FileUtils.isAbsolutePath(path)) {
@@ -537,6 +533,17 @@ namespace NDiffStatLib.ApacheAnt
 		public bool hasWildcards( string input )
 		{
 			return (input.IndexOf('*') != -1 || input.IndexOf('?') != -1);
+		}
+
+		/// <summary>
+		/// When a pattern ends with a '/' or '\', "**" is appended.
+		/// </summary>
+		private string normalizePattern( string pattern )
+		{
+			if (pattern.Length > 0 && FileUtils.IsDirectorySeparator(pattern[pattern.Length-1])) {
+				pattern += SelectorUtils.DEEP_TREE_MATCH;
+			}
+			return pattern;
 		}
 	}
 }
