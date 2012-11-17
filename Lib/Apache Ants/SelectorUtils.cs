@@ -47,7 +47,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <param name="pattern">The pattern to match against. Must not be <code>null</code>.</param>
 		/// <param name="str">The path to match, as a string. Must not be <code>null</code>.</param>
 		/// <returns>whether or not a given path matches the start of a given pattern up to the first "**".</returns>
-		public static bool matchPatternStart( string pattern, string str )
+		public bool matchPatternStart( string pattern, string str )
 		{
 			return matchPatternStart(pattern, str, true);
 		}
@@ -63,7 +63,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <param name="str">The path to match, as a string. Must not be <code>null</code>.</param>
 		/// <param name="isCaseSensitive">Whether or not matching should be performed case sensitively.</param>
 		/// <returns>whether or not a given path matches the start of a given pattern up to the first "**".</returns>
-		public static bool matchPatternStart( string pattern, string str, bool isCaseSensitive )
+		public bool matchPatternStart( string pattern, string str, bool isCaseSensitive )
 		{
 			// When str starts with a directory separator, pattern has to start with a
 			// File.separator.
@@ -90,7 +90,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <param name="strDirs">The tokenized path to match. Must not be <code>null</code>.</param>
 		/// <param name="isCaseSensitive">Whether or not matching should be performed case sensitively.</param>
 		/// <returns>whether or not a given path matches the start of a given pattern up to the first "**".</returns>
-		static bool matchPatternStart( string[] patDirs, string[] strDirs, bool isCaseSensitive )
+		private bool matchPatternStart( string[] patDirs, string[] strDirs, bool isCaseSensitive )
 		{
 			int patIdxStart = 0;
 			int patIdxEnd = patDirs.Length - 1;
@@ -136,7 +136,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <param name="str">The path to match, as a string. Must not be <code>null</code>.</param>
 		/// <param name="isCaseSensitive">Whether or not matching should be performed case sensitively.</param>
 		/// <returns><code>true</code> if the pattern matches against the string, or <code>false</code> otherwise.</returns>
-		public static bool matchPath( string pattern, string str, bool isCaseSensitive=true )
+		public bool matchPath( string pattern, string str, bool isCaseSensitive=true )
 		{
 			string[] patDirs = tokenizePathAsArray(pattern);
 			return matchPath(patDirs, tokenizePathAsArray(str), isCaseSensitive);
@@ -146,7 +146,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// Multi-patterns version of matchPath
 		/// Returns true if the input string match any of the patterns
 		/// </summary>
-		public static bool matchPath( IEnumerable<string> patterns, string str, bool isCaseSensitive=true )
+		public bool matchPath( IEnumerable<string> patterns, string str, bool isCaseSensitive=true )
 		{
 			foreach (string pattern in patterns) {
 				if (matchPath(pattern, str, isCaseSensitive)) {
@@ -160,7 +160,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// Core implementation of matchPath.  It is isolated so that it
 		/// can be called from TokenizedPattern.
 		/// </summary>
-		static bool matchPath( string[] tokenizedPattern, string[] strDirs,
+		private bool matchPath( string[] tokenizedPattern, string[] strDirs,
 								 bool isCaseSensitive )
 		{
 			int patIdxStart = 0;
@@ -281,7 +281,7 @@ namespace NDiffStatLib.ApacheAnt
 		///
 		/// <returns><code>true</code> if the string matches against the pattern,
 		///         or <code>false</code> otherwise.</returns>
-		public static bool match( string pattern, string str )
+		public bool match( string pattern, string str )
 		{
 			return match(pattern, str, true);
 		}
@@ -306,7 +306,7 @@ namespace NDiffStatLib.ApacheAnt
 		///		<code>true</code> if the string matches against the pattern,
 		///     or <code>false</code> otherwise.
 		/// </returns>
-		public static bool match( string pattern, string str, bool caseSensitive )
+		public bool match( string pattern, string str, bool caseSensitive )
 		{
 			int patIdxStart = 0;
 			int patIdxEnd = pattern.Length - 1;
@@ -515,7 +515,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// <param name="granularity">the amount in seconds of slack we will give in
 		///        determining out of dateness
 		/// <returns>whether the target is out of date</returns>
-		public static bool isOutOfDate( FileInfo src, FileInfo target, int granularity )
+		public bool isOutOfDate( FileInfo src, FileInfo target, int granularity )
 		{
 			if (!src.Exists) {
 				return false;
@@ -534,7 +534,7 @@ namespace NDiffStatLib.ApacheAnt
 		/// </summary>
 		/// <param name="input">a string which one wants to test for containing wildcard
 		/// <returns>true if the string contains at least a star or a question mark</returns>
-		public static bool hasWildcards( string input )
+		public bool hasWildcards( string input )
 		{
 			return (input.IndexOf('*') != -1 || input.IndexOf('?') != -1);
 		}

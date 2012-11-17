@@ -91,14 +91,15 @@ namespace NDiffStatLib
 			CustomTextReader reader = new CustomTextReader(lines);
 			FileDiffWithCounterFactory factory = new FileDiffWithCounterFactory(options.merge_opt);
 			DiffParser diffParser = GetDiffParser(reader, factory);
+			SelectorUtils selectorUtils = SelectorUtils.getInstance();
 			foreach (FileDiff fileDiff in diffParser.parse()) {
 				string fileName = !fileDiff.newFile.IsNullOrEmpty() ? fileDiff.newFile : fileDiff.origFile;
 				// check if we should skip file according to inclusion / exclusion list
 				// A file should be skipped if
 				// - The inclusion list is not empty AND it is not in the inclusion list
 				// - OR it is in the exclusion list
-				if (options.included_files_pattern.Count > 0 && !SelectorUtils.matchPath(options.included_files_pattern, fileName, isCaseSensitive: false)
- 					|| SelectorUtils.matchPath(options.excluded_files_pattern, fileName, isCaseSensitive: false)) {
+				if (options.included_files_pattern.Count > 0 && !selectorUtils.matchPath(options.included_files_pattern, fileName, isCaseSensitive: false)
+ 					|| selectorUtils.matchPath(options.excluded_files_pattern, fileName, isCaseSensitive: false)) {
 					continue;
 				}
 				FileDiffWithCounter fileDiffWC =  (FileDiffWithCounter)fileDiff;
