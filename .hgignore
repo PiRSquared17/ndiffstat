@@ -1,0 +1,9 @@
+syntax: glob
+Lib/Resources
+**/bin/Debug
+**/obj/Debug
+**/bin/Release
+**/obj/Release
+*.suo
+*.vsmdi
+*.testsettings
