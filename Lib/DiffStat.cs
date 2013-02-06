@@ -73,8 +73,7 @@ namespace NDiffStatLib
 		private Dictionary<string, FileDiffWithCounter> fileStats = new Dictionary<string, FileDiffWithCounter>();
 
 		/// <summary>
-		/// Constructs a new objet DiffStat and parse the contents of the TextReader
-		/// The TextReader should provide a diff in unified format
+		/// Constructs a new objet DiffStat
 		/// </summary>
 		public DiffStat( DiffStatOptions options )
 		{
@@ -82,7 +81,8 @@ namespace NDiffStatLib
 		}
 
 		/// <summary>
-		/// Run the diff analysis. 
+		/// Run the diff analysis
+		/// The TextReader should provide a diff in unified format 
 		/// The results can be accessed with <c>FileStats</c> property
 		/// </summary>
 		/// <param name="lines"></param>
