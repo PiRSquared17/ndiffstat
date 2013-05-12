@@ -88,7 +88,12 @@ namespace ConsoleApp
 				}
 				if (readFromStdIn) {
 					DiffStat diffStat = new DiffStat(options);
-					diffStat.ParseDiff(Console.In);
+					try {
+						diffStat.ParseDiff(Console.In);
+					} catch (EmptyDiffException ex) {
+						DisplayError(ex.Message);
+						return 1;
+					}
 					Console.WriteLine(diffStat.ToString());
 					return 0;
 				} else {
