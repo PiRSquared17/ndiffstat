@@ -63,7 +63,7 @@ namespace ConsoleApp
 				}
 				try {
 					using (FileStream fs = FileUtils.GetReadonlyStream(file.FullName)) {
-						using (StreamReader sr = new StreamReader(fs, Encoding.Default)) {
+						using (StreamReader sr = new StreamReader(fs, Encoding.GetEncoding(1252), true)) {
 							DiffStat diffStat = new DiffStat(options);
 							diffStat.ParseDiff(sr);
 							Console.WriteLine(diffStat.ToString());
