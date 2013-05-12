@@ -1,4 +1,4 @@
-Copyright (c) 2012 jeckyhl@[Googe Code]
+Copyright (c) 2013 jeckyhl@googlecode.com 
 
 Some classes translated from Review Board source code
 Rewiew Board is published under MIT License

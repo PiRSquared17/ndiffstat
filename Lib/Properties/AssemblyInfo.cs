@@ -5,12 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("DiffStat")]
+[assembly: AssemblyTitle("NDiffStatLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard Company")]
-[assembly: AssemblyProduct("DiffStat")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2012")]
+[assembly: AssemblyProduct("NDiffStatLib")]
+[assembly: AssemblyCopyright("Copyright © jeckyhl@googlecode.com")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
